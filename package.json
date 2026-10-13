@@ -1,0 +1,242 @@
+{
+  "name": "errix",
+  "displayName": "Errix",
+  "description": "AI coding assistant for VS Code: chat with your files, inline edit with diff preview, and searchable chat history. Works with any OpenAI-compatible API.",
+  "version": "0.2.3",
+  "publisher": "manas-chaurasia",
+  "license": "MIT",
+  "preview": true,
+  "icon": "media/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/chaurasiamanas942-max/leanbyte-vscode.git"
+  },
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "AI",
+    "Machine Learning",
+    "Other"
+  ],
+  "keywords": [
+    "ai",
+    "chat",
+    "llm",
+    "openai",
+    "groq",
+    "assistant",
+    "inline edit"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "errix",
+          "title": "Errix",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "errix": [
+        {
+          "type": "webview",
+          "id": "errix.chatView",
+          "name": "Chat",
+          "icon": "media/icon.svg"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "errix.focus",
+        "title": "Focus Chat",
+        "category": "Errix"
+      },
+      {
+        "command": "errix.newChat",
+        "title": "New Chat",
+        "category": "Errix"
+      },
+      {
+        "command": "errix.explain",
+        "title": "Explain",
+        "category": "Errix"
+      },
+      {
+        "command": "errix.refactor",
+        "title": "Refactor",
+        "category": "Errix"
+      },
+      {
+        "command": "errix.generateTests",
+        "title": "Generate Tests",
+        "category": "Errix"
+      },
+      {
+        "command": "errix.fix",
+        "title": "Fix the error",
+        "category": "Errix"
+      },
+      {
+        "command": "errix.inlineEdit",
+        "title": "Edit Selection with Errix",
+        "category": "Errix"
+      },
+      {
+        "command": "errix.setApiKey",
+        "title": "Set API Key",
+        "category": "Errix"
+      },
+      {
+        "command": "errix.clearApiKey",
+        "title": "Clear API Key",
+        "category": "Errix"
+      },
+      {
+        "command": "errix.voice",
+        "title": "Voice to Text",
+        "category": "Errix"
+     }
+    ],
+    "keybindings": [
+      {
+        "command": "errix.focus",
+        "key": "ctrl+shift+i",
+        "mac": "cmd+shift+i",
+        "when": "!terminalFocus"
+      },
+     {
+        "command": "errix.voice",
+        "key": "ctrl+alt+m",
+        "mac": "cmd+alt+m",
+        "when": "!terminalFocus"
+      },
+      {
+        "command": "errix.inlineEdit",
+        "key": "ctrl+alt+k",
+        "mac": "cmd+alt+k",
+        "when": "editorTextFocus && editorHasSelection"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "errix.explain",
+          "when": "editorTextFocus",
+          "group": "9_errix@1"
+        },
+        {
+          "command": "errix.refactor",
+          "when": "editorTextFocus",
+          "group": "9_errix@2"
+        },
+        {
+          "command": "errix.generateTests",
+          "when": "editorTextFocus",
+          "group": "9_errix@3"
+        },
+        {
+          "command": "errix.fix",
+          "when": "editorTextFocus",
+          "group": "9_errix@4"
+        },
+        {
+          "command": "errix.inlineEdit",
+          "when": "editorHasSelection",
+          "group": "9_errix@5"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "errix.focus",
+          "when": "false"
+        }
+      ]
+    },
+  "configuration": {
+  "title": "Errix",
+  "properties": {
+    "errix.apiKey": {
+      "type": "string",
+      "default": "",
+      "markdownDescription": "Optional fallback API key. Prefer running **Errix: Set API Key**, which stores the key in VS Code SecretStorage (OS keychain) instead of `settings.json`.",
+      "order": 1
+    },
+    "errix.baseUrl": {
+      "type": "string",
+      "default": "",
+      "markdownDescription": "API base URL.\n- **Groq (free)**: `https://api.groq.com/openai/v1`\n- **OpenAI**: `https://api.openai.com/v1`\n- **OpenRouter**: `https://openrouter.ai/api/v1`\n- **Ollama**: `http://localhost:11434/v1`",
+      "order": 2
+    },
+    "errix.model": {
+      "type": "string",
+      "default": "",
+      "markdownDescription": "Model ID. Must match the provider in Base URL.\n\n**Groq (free)**: `openai/gpt-oss-120b`, `openai/gpt-oss-20b`, `llama-3.1-8b-instant`\n**OpenAI**: `gpt-4o-mini`, `gpt-4o`",
+      "order": 3
+    },
+    "errix.temperature": {
+      "type": "number",
+      "default": 0.2,
+      "minimum": 0,
+      "maximum": 2,
+      "description": "Sampling temperature. Lower is more deterministic.",
+      "order": 4
+    },
+    "errix.maxContextChars": {
+      "type": "number",
+      "default": 12000,
+      "minimum": 1000,
+      "description": "Maximum number of characters of the current file (or selection) to send as context.",
+      "order": 5
+    },
+    "errix.maxTotalContextChars": {
+      "type": "number",
+      "default": 24000,
+      "minimum": 2000,
+      "markdownDescription": "Total characters of code sent per question, across the current file, attached files, `@mentions` and open tabs. Files that do not fit are skipped and listed under your message.",
+      "order": 6
+    },
+    "errix.systemPrompt": {
+      "type": "string",
+      "default": "",
+      "editPresentation": "multilineText",
+      "markdownDescription": "Override the built-in system prompt. Leave empty to use the default.",
+      "order": 7
+    },
+    "errix.voiceModel": {
+      "type": "string",
+      "default": "",
+      "markdownDescription": "Speech-to-text model. Leave empty to choose automatically (`whisper-large-v3' on Groq, `whisper-1` on OpenAI).",
+      "order": 8
+    },
+    "errix.voiceLanguage": {
+      "type": "string",
+      "default": "",
+      "description": "Optional language code, for example `en` or `hi`. Leave empty to auto-detect.",
+      "order": 9
+    }
+  }
+} 
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "tsc -p ./ --noEmit",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/vscode": "^1.85.0",
+    "@vscode/test-web": "^0.0.81",
+    "@vscode/vsce": "^2.24.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.3"
+  }
+}
