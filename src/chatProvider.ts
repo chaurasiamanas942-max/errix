@@ -882,7 +882,8 @@ export class ChatProvider implements vscode.WebviewViewProvider {
   // API key
   // ---------------------------------------------------------------------------
 
-  private async getApiKey(): Promise<string | undefined> {
+    private async getApiKey(): Promise<string | undefined> {
+    // 1. Bring your own key: unlimited, goes straight to your provider.
     const fromSecrets = await this.context.secrets.get(SECRET_KEY);
     if (fromSecrets) return fromSecrets;
 
@@ -892,28 +893,16 @@ export class ChatProvider implements vscode.WebviewViewProvider {
       .trim();
     if (fromSettings) return fromSettings;
 
-    const fromEnv = process.env.GROQ_API_KEY?.trim() || process.env.OPENAI_API_KEY?.trim();
-    if (fromEnv) return fromEnv;
-
-    // No key anywhere: guide the user instead of failing.
-    const pick = await vscode.window.showWarningMessage(
-      'Errix needs an API key (free Groq or OpenAI).',
-      'Enter key',
-      'Get free Groq key',
-      'Get OpenAI key'
-    );
-    if (!pick) return undefined;
-
-    if (pick === 'Get free Groq key') {
-      await vscode.env.openExternal(vscode.Uri.parse('https://console.groq.com/keys'));
-    } else if (pick === 'Get OpenAI key') {
-      await vscode.env.openExternal(vscode.Uri.parse('https://platform.openai.com/api-keys'));
+    // 2. Errix Cloud: one-click GitHub sign-in with free daily limits.
+    try {
+      const session = await vscode.authentication.getSession('github', ['read:user'], {
+        createIfNone: true
+      });
+      return session.accessToken;
+    } catch {
+      return undefined; // the person closed the sign-in prompt
     }
-
-    await vscode.commands.executeCommand('errix.setApiKey');
-    return (await this.context.secrets.get(SECRET_KEY)) || undefined;
   }
-
   // ---------------------------------------------------------------------------
   // Webview HTML
   // ---------------------------------------------------------------------------

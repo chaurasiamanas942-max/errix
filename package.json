@@ -9,7 +9,7 @@
   "icon": "media/icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chaurasiamanas942-max/leanbyte-vscode.git"
+    "url": "https://github.com/chaurasiamanas942-max/errix.git"
   },
   "engines": {
     "vscode": "^1.85.0"
@@ -218,7 +218,13 @@
       "default": "",
       "description": "Optional language code, for example `en` or `hi`. Leave empty to auto-detect.",
       "order": 9
-    }
+    },
+    "errix.cloudUrl": {
+      "type": "string",
+      "default": "",
+      "description": "Advanced: Errix Cloud address (for example http://localhost:3000/api/v1 when testing).",
+      "order": 10
+            }
   }
 } 
   },

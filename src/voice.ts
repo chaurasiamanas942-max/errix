@@ -159,10 +159,17 @@ async function transcribe(rec: Recording, o: VoiceOptions): Promise<string> {
 
   if (!res.ok) {
     const body = await res.text().catch(() => '');
-    throw new Error(`Transcription API ${res.status}: ${body.slice(0, 300)}`);
+    let message = body.slice(0, 300);
+    try {
+      const parsed = JSON.parse(body);
+      if (parsed?.error?.message) message = parsed.error.message;
+    } catch {
+      /* not JSON */
+    }
+    throw new Error(res.status === 429 ? message : `API ${res.status}: ${message}`);
   }
-  const json = (await res.json()) as { text?: string };
-  return (json.text ?? '').trim();
+ const data = await res.json() as { text?: string };
+return (data.text ?? '').trim();
 }
 
 /** Returns the spoken text, '' if nothing was recognized, or undefined if cancelled. */

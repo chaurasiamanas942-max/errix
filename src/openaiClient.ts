@@ -35,16 +35,23 @@ export async function streamChat(opts: StreamChatOptions): Promise<string> {
     }),
     signal: opts.signal,
   });
-
-  if (!res.ok) {
+ if (!res.ok) {
     const body = await res.text().catch(() => '');
-    throw new Error(`API ${res.status}: ${body.slice(0, 300)}`);
-  }
-  if (!res.body) {
-    throw new Error('No response body');
+    let message = body.slice(0, 300);
+    try {
+      const parsed = JSON.parse(body);
+      if (parsed?.error?.message) message = parsed.error.message;
+    } catch {
+      /* not JSON */
+    }
+    throw new Error(res.status === 429 ? message : `API ${res.status}: ${message}`);
   }
 
-  const reader = res.body.getReader();
+if (!res.body) {
+  throw new Error('Response body is missing (streaming not supported by the endpoint or network layer)');
+}
+
+const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
   let full = '';
