@@ -9,3 +9,5 @@ out/**/*.map
 **/*.ts
 !out/**/*.js
 node_modules/**
+web/**
+supabase/**

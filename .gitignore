@@ -17,8 +17,6 @@ node_modules/
 out/
 node_modules/
 *.vsix
-web/**
-supabase/**
 
 .enc.local
 
